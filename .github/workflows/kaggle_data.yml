@@ -3,10 +3,6 @@ name: Kaggle Dataset Download
 on:
   workflow_dispatch:
 
-# Required to allow the runner to push the dataset to your repository
-permissions:
-  contents: write
-
 jobs:
   download:
     runs-on: ubuntu-latest
@@ -18,13 +14,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          # Using the exact stable version from your provided list
+          # Using exact stable version from your list
           python-version: '3.12.13' 
 
       - name: Install dependencies
-          # Using --upgrade ensures we get the latest kaggle tool
-        run: |
-          pip install --upgrade kaggle
+        run: pip install --upgrade kaggle
 
       - name: Configure Kaggle credentials
         run: |
@@ -32,20 +26,15 @@ jobs:
           echo "{\"username\":\"${{ secrets.KAGGLE_USERNAME }}\",\"key\":\"${{ secrets.KAGGLE_KEY }}\"}" > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
 
-      - name: Download dataset
+      - name: Download and Unzip dataset
         run: |
           mkdir -p data/external
-          kaggle datasets download -d jacksoncrow/stock-market-dataset -p data/external
+          # This downloads and extracts the 1GB dataset
+          kaggle datasets download -d jacksoncrow/stock-market-dataset -p data/external --unzip
 
-      - name: Extract dataset
-        run: |
-          unzip -o data/external/stock-market-dataset.zip -d data/external
-
-      - name: Commit and Push data
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add data/external
-          # If no changes are found, '|| exit 0' prevents the job from failing
-          git commit -m "Update Kaggle dataset" || exit 0
-          git push
+      - name: Upload Dataset as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-market-data
+          path: data/external/
+          retention-days: 7
