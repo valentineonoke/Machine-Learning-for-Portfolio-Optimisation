@@ -1,0 +1,23 @@
+# requirements.txt
+
+```txt
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+xgboost
+lightgbm
+tensorflow
+torch
+yfinance
+cvxpy
+PyPortfolioOpt
+scipy
+statsmodels
+streamlit
+plotly
+jupyter
+pytest
+black
+flake8
