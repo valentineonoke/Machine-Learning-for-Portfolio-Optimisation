@@ -3,7 +3,7 @@ name: Kaggle Dataset Download
 on:
   workflow_dispatch:
 
-# Added permissions block to allow the runner to push data to your repository
+# Required to allow the runner to push the dataset to your repository
 permissions:
   contents: write
 
@@ -13,17 +13,18 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4 # Updated to v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5 # Updated to v5
+        uses: actions/setup-python@v5
         with:
-          # IMPORTANT: Use quotes around the version number!
-          python-version: '3.12' 
+          # Using the exact stable version from your provided list
+          python-version: '3.12.13' 
 
       - name: Install dependencies
+          # Using --upgrade ensures we get the latest kaggle tool
         run: |
-          pip install kaggle
+          pip install --upgrade kaggle
 
       - name: Configure Kaggle credentials
         run: |
@@ -40,11 +41,11 @@ jobs:
         run: |
           unzip -o data/external/stock-market-dataset.zip -d data/external
 
-      - name: Commit data
+      - name: Commit and Push data
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/external
-          # If there are no changes, || exit 0 prevents the workflow from failing
+          # If no changes are found, '|| exit 0' prevents the job from failing
           git commit -m "Update Kaggle dataset" || exit 0
           git push
