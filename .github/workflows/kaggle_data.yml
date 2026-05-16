@@ -3,7 +3,7 @@ name: Kaggle Dataset Download
 on:
   workflow_dispatch:
 
-# Essential: Grant write permissions so the runner can push changes back to your repo
+# 1. Added permissions so the script can actually push the data to your repo
 permissions:
   contents: write
 
@@ -13,14 +13,14 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4 # Use v4 (latest stable)
+        uses: actions/checkout@v4 # Updated to v4 to fix the warning
 
       - name: Setup Python
-        uses: actions/setup-python@v5 # v5 is correct here
+        uses: actions/setup-python@v5 # Updated to v5 to fix the warning
         with:
-          # IMPORTANT: Always wrap the version in quotes (e.g., '3.12') 
-          # to prevent YAML from turning 3.10 into 3.1
-          python-version: '3.12'
+          # IMPORTANT: Use quotes around the version number! 
+          # Without quotes, '3.12' becomes '3.1', which causes your error.
+          python-version: '3.12' 
 
       - name: Install dependencies
         run: |
@@ -46,6 +46,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/external
-          # If there are no changes, this won't crash the workflow
-          git commit -m "Add Kaggle dataset" || exit 0
+          # If there are no new changes, this command won't fail the workflow
+          git commit -m "Update Kaggle dataset" || exit 0
           git push
